@@ -1,25 +1,6 @@
 import React from "react";
-// import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../authConfig";
 import Button from "react-bootstrap/Button";
-// import { useAuth0 } from "@auth0/auth0-react";
-
-function handleLogin(instance) {
-    instance.loginPopup(loginRequest).catch(e => {
-        console.error(e);
-    });
-}
-
-/**
- * Renders a button which, when selected, will open a popup for login
- */
-// export const SignInButton = () => {
-//     const { instance } = useMsal();
-
-//     return (
-//         <Button variant="secondary" className="ml-auto" onClick={() => handleLogin(instance)}>Sign in using Popup</Button>
-//     );
-// }
 
 function generateVerifier() {
     const array = new Uint32Array(28)
@@ -39,14 +20,11 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 async function getToken(verifier, code) {
-    const tenant = "f438bf46-6810-4949-a0d3-838cf39e6fef";
+    const tenant = "{yourTenantId}";
     const host = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`
-    const clientId = '6f7f3232-f9a1-488b-848e-22caa6fea12f'
+    const clientId = '{yourAppClientId}'
     const redirectUri = `http%3A%2F%2Flocalhost%3A3000`
     const grantType = 'authorization_code';
-    // Get code from query params
-    // const urlParams = new URLSearchParams(window.location.search)
-    // const code = urlParams.get('code')
   
     // Build params to send to token endpoint
     const params = `client_id=${clientId}&
@@ -81,17 +59,14 @@ const getOAuthPopupFeatures = ({width, height, top}: Box) => {
     // 64 is the Parabol header
     const topOff = Math.round(startY + (innerHeight - height) / 2 + top)
     return `popup,width=${width},height=${height},left=${left},top=${topOff}`
-  }
+}
 
-// fetch = window.fetch.bind(window)
 async function openAuth() {
-    // fetch = window.fetch.bind(window)
     const plainVerifier = generateVerifier();
     const code = await generateCodeChallenge(plainVerifier);
-    const tenant = "f438bf46-6810-4949-a0d3-838cf39e6fef";
-    const clientId = "6f7f3232-f9a1-488b-848e-22caa6fea12f";
+    const tenant = "{yourTenantId}";
+    const clientId = "{yourAppClientId}";
     const redirect = "http%3A%2F%2Flocalhost%3A3000"
-    // const url = `https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=6731de76-14a6-49ae-97bc-6eba6914391e&response_type=code&redirect_uri=${redirect}&response_mode=query&scope=openid%20offline_access%20https%3A%2F%2Fgraph.microsoft.com%2Fmail.read&state=12345&code_challenge=${code}&code_challenge_method=S256`;
     const url = `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirect}&response_mode=query&scope=openid%20offline_access%20https%3A%2F%2Fgraph.microsoft.com%2Fmail.read&state=12345&code_challenge=${code}&code_challenge_method=S256`;
 
     const popout = window.open(
@@ -99,7 +74,7 @@ async function openAuth() {
         "New OAuth",
         getOAuthPopupFeatures({width: 500, height: 750, top: 56})
     );
-    // popout.close()
+
     const handler = (event) => {
         console.log(event);
         console.log(event.data)
@@ -135,22 +110,10 @@ async function openAuth() {
             window.postMessage({'data': {'message': 'Redirect has occured.'}})
         }
     }, 500);
-    // const token = getToken(plainVerifier, authCode)
-    
-    // window.postMessage("Auth flow started!")
 }
 
 export const SignInButton = () => {
-    // const { instance } = useMsal();
-
     return (
         <Button variant="secondary" className="ml-auto" onClick={openAuth}>Sign in using Popup</Button>
     );
 }
-// export const SignInButton = () => {
-//     const { loginWithRedirect } = useAuth0();
-
-//     return (
-//         <Button variant="secondary" className="ml-auto" onClick={() => loginWithRedirect()}>Sign in using Popup</Button>
-//     );
-// }
